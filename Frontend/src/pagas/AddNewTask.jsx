@@ -18,8 +18,9 @@ const AddNewTask = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { loading, error } = useSelector((state) => state.tasks);
-  
+  const [errors, setErrors] = useState({});
 
+console.log(useSelector((state) => state.tasks))
   const [taskData, setTaskData] = useState({
     title: "",
     priority: "low",
@@ -27,22 +28,35 @@ const AddNewTask = () => {
     tags: ""
   });
 
+  const { title, priority, description, tags } = taskData;
+  // Validate form fields
+const validate = () => {
+    const newErrors = {};
+    if (!taskData.title.trim()) newErrors.title = "Title is required";
+    if (!taskData.description.trim()) newErrors.description = "Description is required";
+return newErrors;
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setTaskData({ ...taskData, [name]: value });
   };
 
   const handleSubmit = async (e) => {
-    console.log(taskData);
-    
-    e.preventDefault();
+        e.preventDefault();
+
+    const validateErrors = validate();
+    console.log(validateErrors)
+    setErrors(validateErrors);
+
+    if(errors && Object.keys(validateErrors).length === 0) {
     const submitData = {
       ...taskData,
       tags: taskData.tags
         ? taskData.tags.split(',').map(t => t.trim()).filter(Boolean)
         : []
     };
-    const result =  dispatch(addTask(submitData));
+    const result = await  dispatch(addTask(submitData));
 
     if (result.meta.requestStatus === "fulfilled") {
       toaster.create({
@@ -54,6 +68,7 @@ const AddNewTask = () => {
 
       navigate("/");
     }
+  }
   };
 
   return (
@@ -61,8 +76,15 @@ const AddNewTask = () => {
       <Fieldset.Root size="md" as="form" onSubmit={handleSubmit}>
         <Fieldset.Legend>Task details</Fieldset.Legend>
 
-        {error && <Text color="red.500">{error}</Text>}
+        {error && <Text color="red.500">{error?.message}</Text>}
 
+        {errors &&   Object.keys(errors).length > 0 && (
+          <Text color="red.500" mb={4}>
+            {Object.values(errors).map((err, index) => (
+              <div key={index}>{err}</div>
+            ))}
+          </Text>
+        )}  
         <Field.Root>
           <Field.Label>Title</Field.Label>
           <Input name="title" value={taskData.title} onChange={handleChange} />
@@ -108,7 +130,7 @@ const AddNewTask = () => {
         <Button
           type="submit"
           alignSelf="flex-start"
-          isLoading={loading}
+          loading={loading}
           loadingText="Adding..."
           onClick={handleSubmit}
         >
