@@ -92,11 +92,11 @@ const handleLogout = () => {
                     SignOut
                   </Button>
                 ) : (
-                  <Link to={"/singin"}>
+                <Link to={"/singin"}>
                     <Button size={"md"} hidden={isSerchActive}>
-                      SingIn
-                    </Button>
-                  </Link>
+                    SingIn
+                </Button>
+                </Link>
                 )}
 
             </HStack>

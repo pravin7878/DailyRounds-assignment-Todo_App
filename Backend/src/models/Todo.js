@@ -19,6 +19,18 @@ const todoSchema = mongoose.Schema(
       enum: ["low", "medium", "high"],
       default: "medium",
     },
+    tags: [{
+      type: String,
+      trim: true
+    }],
+    
+    notes: [
+      {
+        text: { type: String },
+        createdAt: { type: Date, default: Date.now },
+        author: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
+      }
+    ],
     
     userId: {
       type: mongoose.Schema.Types.ObjectId,

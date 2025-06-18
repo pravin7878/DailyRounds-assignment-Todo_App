@@ -24,6 +24,7 @@ const AddNewTask = () => {
     title: "",
     priority: "low",
     description: "",
+    tags: ""
   });
 
   const handleChange = (e) => {
@@ -35,7 +36,13 @@ const AddNewTask = () => {
     console.log(taskData);
     
     e.preventDefault();
-    const result = await dispatch(addTask(taskData));
+    const submitData = {
+      ...taskData,
+      tags: taskData.tags
+        ? taskData.tags.split(',').map(t => t.trim()).filter(Boolean)
+        : []
+    };
+    const result =  dispatch(addTask(submitData));
 
     if (result.meta.requestStatus === "fulfilled") {
       toaster.create({
@@ -85,6 +92,16 @@ const AddNewTask = () => {
             name="description"
             value={taskData.description}
             onChange={handleChange}
+          />
+        </Field.Root>
+
+        <Field.Root>
+          <Field.Label>Tags (comma separated)</Field.Label>
+          <Input
+            name="tags"
+            value={taskData.tags}
+            onChange={handleChange}
+            placeholder="e.g. work, urgent, personal"
           />
         </Field.Root>
 

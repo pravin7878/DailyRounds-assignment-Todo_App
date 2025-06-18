@@ -1,18 +1,19 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchTasks, deleteTask, updateTask } from '../app/actions/task';
-import { Text, Button, VStack, HStack, Flex, SimpleGrid, IconButton,Checkbox, useDisclosure } from '@chakra-ui/react';
+import { fetchTasks, deleteTask, updateTask, addNoteToTask } from '../app/actions/task';
+import { Text, Button, VStack, HStack, Flex, SimpleGrid, IconButton, Checkbox, useDisclosure } from '@chakra-ui/react';
 import { Link } from 'react-router-dom';
 import { LuDelete } from 'react-icons/lu';
 import { AiFillDelete } from 'react-icons/ai';
-import { FaEdit } from 'react-icons/fa';
+import { FaEdit, FaRegStickyNote } from 'react-icons/fa';
 import { EditTaskModal } from '../components/custom/EditModal';
+import NotesModal from '../components/custom/NotesModal';
+
 
 const Dashboard = () => {
   const dispatch = useDispatch();
   const { tasks, loading, error } = useSelector((state) => state.tasks);
   const { isOpen, onOpen, onClose } = useDisclosure();
-  
 
   useEffect(() => {
     dispatch(fetchTasks());
@@ -22,8 +23,8 @@ const Dashboard = () => {
     onOpen();
   };
 
-  const toggleStatus = async (taskId,task) => {
-const updatedTask = {...task , status : task?.status === "pending" ? "completed" : "pending"}
+  const toggleStatus = async (taskId, task) => {
+    const updatedTask = { ...task, status: task?.status === "pending" ? "completed" : "pending" }
     const result = await dispatch(updateTask({ taskId, taskData: updatedTask }));
     if (result.meta.requestStatus === "fulfilled") {
       console.log("Task updated successfully");
@@ -66,29 +67,49 @@ const updatedTask = {...task , status : task?.status === "pending" ? "completed"
             <VStack key={task._id} border="1px solid #ccc" p={4} borderRadius="md" w="100%">
               <Text fontWeight="bold">{task.title}</Text>
               <Text>{task.description}</Text>
+              {task.tags && task.tags.length > 0 && (
+                <HStack wrap="wrap" spacing={1} mb={2}>
+                  {task.tags.map((tag, idx) => (
+                    <Text key={idx} fontSize="xs" color="gray.500" bg="gray.100" px={2} py={0.5} borderRadius="md">
+                      #{tag}
+                    </Text>
+                  ))}
+                </HStack>
+              )}
               <HStack>
+                <NotesModal
+                  notes={task.notes || []}
+                  onAddNote={async (noteText) => {
+                    await dispatch(addNoteToTask({ taskId: task._id, text: noteText }));
+                    dispatch(fetchTasks());
+                  }}
+                >
+                  <IconButton
+                    variant="ghost"
+                    size="sm"
+                    aria-label="Notes"
+                    icon={<FaRegStickyNote />}
+                  />
+                </NotesModal>
 
-              <IconButton variant={"ghost"} size="sm" onClick={() => handleEdit(task)}>
-              <Checkbox.Root onChange={()=>toggleStatus(task._id,task)} checked={task?.status === "completed"}>
-      <Checkbox.HiddenInput />
-      <Checkbox.Control />
-    </Checkbox.Root>
+                <IconButton variant={"ghost"} size="sm" onClick={() => handleEdit(task)}>
+                  <Checkbox.Root onChange={() => toggleStatus(task._id, task)} checked={task?.status === "completed"}>
+                    <Checkbox.HiddenInput />
+                    <Checkbox.Control />
+                  </Checkbox.Root>
                 </IconButton>
 
-              <EditTaskModal
-          task={task}
-          isOpen={isOpen}
-          onClose={onClose}
-          onSave={handleSave}
-        >
+                <EditTaskModal
+                  task={task}
+                  isOpen={isOpen}
+                  onClose={onClose}
+                  onSave={handleSave}
+                >
+                  <IconButton variant={"ghost"} size="sm" onClick={() => handleEdit(task)}>
+                    <FaEdit />
+                  </IconButton>
+                </EditTaskModal>
 
-
-<IconButton variant={"ghost"} size="sm" onClick={() => handleEdit(task)}>
-                  <FaEdit />
-                </IconButton>
-
-        </EditTaskModal>
-                
                 <IconButton variant={"ghost"} size="sm" onClick={() => handleDelete(task._id)}>
                   <AiFillDelete />
                 </IconButton>
@@ -98,7 +119,7 @@ const updatedTask = {...task , status : task?.status === "pending" ? "completed"
         </SimpleGrid>
       </VStack>
 
-      
+
     </Flex>
   );
 };

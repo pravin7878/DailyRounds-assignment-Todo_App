@@ -66,3 +66,16 @@ export const deleteTask = createAsyncThunk('tasks/deleteTask', async (taskId, { 
     return rejectWithValue(error.response.data);
   }
 });
+
+// Add a note to a task
+export const addNoteToTask = createAsyncThunk('tasks/addNoteToTask', async ({ taskId, text }, { rejectWithValue }) => {
+  try {
+    const token = getToken();
+    const response = await api.post(`/tasks/${taskId}/notes`, { text }, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return { taskId, note: response.data.note };
+  } catch (error) {
+    return rejectWithValue(error.response.data);
+  }
+});

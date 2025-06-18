@@ -10,7 +10,10 @@ import React, { useState } from "react"
   } from "@chakra-ui/react"
   
   export const EditTaskModal = ({ task, onClose, onSave,children }) => {
-    const [updatedTask, setUpdatedTask] = useState(task);
+    const [updatedTask, setUpdatedTask] = useState({
+      ...task,
+      tags: Array.isArray(task.tags) ? task.tags.join(', ') : (task.tags || '')
+    });
   
     const handleChange = (e) => {
       const { name, value } = e.target;
@@ -18,42 +21,19 @@ import React, { useState } from "react"
     };
   
     const handleSave = () => {
-      onSave(updatedTask);
+      // Convert tags string to array before saving
+      const submitTask = {
+        ...updatedTask,
+        tags: updatedTask.tags
+          ? updatedTask.tags.split(',').map(t => t.trim()).filter(Boolean)
+          : []
+      };
+      onSave(submitTask);
       onClose();
     };
   
     return (
-    //   <Modal isOpen={isOpen} onClose={onClose}>
-    //     <ModalOverlay />
-    //     <ModalContent>
-    //       <ModalHeader>Edit Task</ModalHeader>
-    //       <ModalCloseButton />
-    //       <ModalBody>
-    //         <Input
-    //           name="title"
-    //           value={updatedTask.title}
-    //           onChange={handleChange}
-    //           placeholder="Title"
-    //           mb={4}
-    //         />
-    //         <Input
-    //           name="description"
-    //           value={updatedTask.description}
-    //           onChange={handleChange}
-    //           placeholder="Description"
-    //         />
-    //       </ModalBody>
-    //       <ModalFooter>
-    //         <Button colorScheme="blue" mr={3} onClick={handleSave}>
-    //           Save
-    //         </Button>
-    //         <Button variant="ghost" onClick={onClose}>
-    //           Cancel
-    //         </Button>
-    //       </ModalFooter>
-    //     </ModalContent>
-    //   </Modal>
-
+    
     <Dialog.Root
             placement={"center"}
             motionPreset="slide-in-bottom"
@@ -83,6 +63,13 @@ import React, { useState } from "react"
               placeholder="Description"
             />
 
+            <Input
+              name="tags"
+              value={updatedTask.tags}
+              onChange={handleChange}
+              placeholder="Tags (comma separated)"
+              mt={4}
+            />
 
             
                   </Dialog.Body>

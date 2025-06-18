@@ -6,7 +6,8 @@ const addNewTask = async (req, res) => {
     title,
     description,
     status,
-    priority
+    priority,
+    tags
   } = req.body;
 
   try {
@@ -18,6 +19,7 @@ if(isAlreadyExist) return res.status(400).json({message: "can not add duplicate 
       description,
       status,
       priority,
+      tags: Array.isArray(tags) ? tags : (typeof tags === 'string' ? tags.split(',').map(t => t.trim()).filter(Boolean) : []),
       userId : req.user?.userId
     });
     const newTaks = await todo.save();
@@ -59,6 +61,10 @@ const updateTask = async (req, res) => {
   const { taskId } = req.params;
   const userId = req.user.userId;
   try {
+    // If tags is a string, convert to array
+    if (req.body.tags && typeof req.body.tags === 'string') {
+      req.body.tags = req.body.tags.split(',').map(t => t.trim()).filter(Boolean);
+    }
     const task = await Todo.findOneAndUpdate(
       { _id: taskId, userId },
       req.body,
@@ -90,4 +96,33 @@ const removeTask = async (req, res) => {
     res.status(500).json({ message: "internal server error" });
   }
 };
-module.exports = { addNewTask, getTask, updateTask, removeTask };
+
+// Add a note to a todo
+const addNoteToTask = async (req, res) => {
+  const { taskId } = req.params;
+  const { text } = req.body;
+  const userId = req.user.userId;
+
+  if (!text || !text.trim()) {
+    return res.status(400).json({ message: 'Note text is required.' });
+  }
+
+  try {
+    const todo = await Todo.findById(taskId);
+    if (!todo) return res.status(404).json({ message: 'Task not found.' });
+
+    const note = {
+      text: text.trim(),
+      author: userId,
+      createdAt: new Date()
+    };
+    todo.notes.push(note);
+    await todo.save();
+    res.status(201).json({ message: 'Note added successfully.', note });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
+module.exports = { addNewTask, getTask, updateTask, removeTask, addNoteToTask };

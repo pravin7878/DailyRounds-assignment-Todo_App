@@ -4,6 +4,7 @@ const {
   getTask,
   updateTask,
   removeTask,
+  addNoteToTask
 } = require("../controlers/todo");
 const { auth } = require("../middelware/auth");
 
@@ -21,5 +22,8 @@ todoRouter.patch("/:taskId" ,auth, updateTask)
 
 // remove task
 todoRouter.delete("/:taskId", auth, removeTask);
+
+// add a note to a task
+todoRouter.post("/:taskId/notes", auth, addNoteToTask);
 
 module.exports = todoRouter

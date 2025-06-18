@@ -1,5 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { fetchTasks, addTask, updateTask, deleteTask } from '../actions/task';
+import { toaster } from '../../components/ui/toaster';
 
 const taskSlice = createSlice({
   name: 'tasks',
@@ -32,6 +33,10 @@ const taskSlice = createSlice({
       .addCase(addTask.fulfilled, (state, action) => {
         state.loading = false;
         state.tasks.push(action.payload);
+        toaster({
+          type : "success",
+          description : "Task New Created!"
+        })
       })
       .addCase(addTask.rejected, (state, action) => {
         state.loading = false;
