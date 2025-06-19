@@ -73,6 +73,7 @@ return newErrors;
         : [],
       mentions: mentions.map(u => u._id),
     };
+    console.log(submitData)
     const result = await  dispatch(addTask(submitData));
 console.log(result)
     if (result.meta.requestStatus === "fulfilled") {

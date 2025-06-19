@@ -16,6 +16,7 @@ const addNewTask = async (req, res) => {
     const isAlreadyExist = await Todo.findOne({title})
     if(isAlreadyExist) return res.status(400).json({message: "can not add duplicate task!"})
 
+      console.log("mentions",mentions)
     let mentionsArr = [];
     if (Array.isArray(mentions) && mentions.length > 0) {
       // Validate all mentioned users exist
@@ -24,6 +25,8 @@ const addNewTask = async (req, res) => {
         return res.status(400).json({ message: "One or more mentioned users do not exist." });
       }
       mentionsArr = mentions;
+
+      console.log("mentionsArr",mentionsArr)
     }
 
     const todo = new Todo({

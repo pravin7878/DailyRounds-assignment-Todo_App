@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   Box,
   Input,
@@ -7,99 +7,156 @@ import {
   VStack,
   List,
   ListItem,
+  HStack,
+  Text,
+  Flex
   // useOutsideClick,
 } from '@chakra-ui/react';
-// Fix: Import TagCloseButton separately from the same package
-// import { TagCloseButton } from '@chakra-ui/react';
+
 
 const MentionsInputChakra = ({ users, value, onChange, placeholder }) => {
   const [input, setInput] = useState('');
   const [showDropdown, setShowDropdown] = useState(false);
   const [filteredUsers, setFilteredUsers] = useState([]);
+  const [focusedIndex, setFocusedIndex] = useState(-1);
   const ref = useRef();
+  const inputRef = useRef();
 
-  // useOutsideClick({
-  //   ref: ref,
-  //   handler: () => setShowDropdown(false),
-  // });
+// Outside click handler
+useEffect(() => {
+  function handleClickOutside(event) {
+    if (ref.current && !ref.current.contains(event.target)) {
+      setShowDropdown(false);
+    }
+  }
+  if (showDropdown) {
+    document.addEventListener("mousedown", handleClickOutside);
+  }
+  return () => {
+    document.removeEventListener("mousedown", handleClickOutside);
+  };
+}, [showDropdown]);
 
+
+  useEffect(() => {
+    setFilteredUsers(users)
+  }, [users])
+
+  // Handle input change
   const handleInputChange = (e) => {
     const val = e.target.value;
     setInput(val);
-    // const match = val.match(/@([\w]*)$/);
-    // if (match) {
-    //   const search = match[1].toLowerCase();
-    //   setFilteredUsers(
-    //     users.filter(
-    //       (u) =>
-    //         !value.some((v) => v._id === u._id) &&
-    //         u.name.toLowerCase().includes(search)
-    //     )
-    //   );
-    //   setShowDropdown(true);
-    // } else {
-    //   setShowDropdown(false);
-    // }
+    // If last word starts with @, show dropdown
+    const match = val.match(/@([\w]*)$/);
+    if (match) {
+      const search = match[1].toLowerCase();
+      const filtered = users.filter(
+        (u) =>
+          !value.some((v) => v._id === u._id) &&
+          u.name.toLowerCase().includes(search)
+      );
+      setFilteredUsers(filtered);
+      setShowDropdown(true);
+      setFocusedIndex(filtered.length > 0 ? 0 : -1);
+    } else {
+      setShowDropdown(false);
+      setFocusedIndex(-1);
+    }
   };
 
+  // Keyboard navigation
+  const handleInputKeyDown = (e) => {
+    if (!showDropdown || filteredUsers.length === 0) return;
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setFocusedIndex((prev) => (prev + 1) % filteredUsers.length);
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setFocusedIndex((prev) => (prev - 1 + filteredUsers.length) % filteredUsers.length);
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      if (focusedIndex >= 0 && focusedIndex < filteredUsers.length) {
+        handleUserSelect(filteredUsers[focusedIndex]);
+      }
+    }
+  };
+
+  // Handle user select
   const handleUserSelect = (user) => {
-    const newInput = input.replace(/@([\w]*)$/, '');
+    const newInput = input.replace(/@([\w]*)$/, "");
     setInput(newInput);
     onChange([...value, user]);
     setShowDropdown(false);
+    setFocusedIndex(-1);
+    inputRef.current.focus();
   };
 
+  // Remove mention
   const handleRemove = (userId) => {
     onChange(value.filter((u) => u._id !== userId));
   };
 
   return (
-    <Box position="relative" ref={ref}>
+    <Box ref={ref} width={"100%"}>
       <VStack align="stretch" spacing={2}>
-        <Box display="flex" flexWrap="wrap" gap={2} mb={1}>
-          {value.map((user) => (
-            <Tag key={user._id} colorScheme="teal" borderRadius="full">
-              <TagLabel>@{user.name}</TagLabel>
-              {/* <TagCloseButton onClick={() => handleRemove(user._id)} /> */}
-            </Tag>
-          ))}
-        </Box>
-        <Input
-          value={input}
-          onChange={handleInputChange}
-          placeholder={placeholder}
-          autoComplete="off"
-        />
-        {showDropdown && filteredUsers.length > 0 && (
-          <List
-            position="absolute"
-            zIndex={10}
-            bg="white"
+      {showDropdown && filteredUsers.length > 0 && (
+          <List.Root
             border="1px solid #ccc"
             borderRadius="md"
-            mt={1}
-            w="100%"
             maxH="150px"
             overflowY="auto"
             boxShadow="md"
           >
-            {filteredUsers.map((user) => (
-              <ListItem
+            {filteredUsers.map((user, idx) => (
+              <List.Item
                 key={user._id}
-                px={3}
-                py={2}
                 cursor="pointer"
-                _hover={{ bg: 'teal.50' }}
+                bg={idx === focusedIndex ? 'gray.100' : 'transparent'}
                 onClick={() => handleUserSelect(user)}
               >
-                @{user.name}{' '}
-                <Box as="span" color="gray.500" fontSize="sm">
-                  ({user.email})
-                </Box>
-              </ListItem>
+                <HStack 
+                color={idx === focusedIndex ? 'black' : 'white'}
+                px={3} py={1} _hover={{ color: "black", bg: "gray.100" }} justify={"space-between"} as="span" fontSize="sm">
+                  <Text>@{user.name}{' '}</Text>
+                  <Text>{user.email}</Text>
+                </HStack>
+              </List.Item>
             ))}
-          </List>
+          </List.Root>
         )}
+
+        <Flex
+          align="center"
+          flexWrap="wrap"
+          gap={2}
+          borderWidth={1}
+          borderRadius="md"
+          px={2}
+          minH="40px"
+          _focusWithin={{ boxShadow: "outline", borderColor: "white" }}
+        onClick={() => inputRef.current.focus()}
+        >
+          {value.map((user) => (
+            <Tag.Root fontWeight={"bold"} key={user._id} bg={"gray.100"} p={2} color="black" borderRadius="full">
+              <Tag.Label>@{user.name}</Tag.Label>
+              <Tag.EndElement>
+                <Tag.CloseTrigger onClick={handleRemove}/>
+              </Tag.EndElement>
+            </Tag.Root>
+          ))}
+          <Input
+            ref={inputRef}
+            variant="unstyled"
+            flex={1}
+            minW="120px"
+            value={input}
+            onChange={handleInputChange}
+            onKeyDown={handleInputKeyDown}
+            placeholder={placeholder}
+            autoComplete="off"
+          />
+        </Flex>
+
       </VStack>
     </Box>
   );
