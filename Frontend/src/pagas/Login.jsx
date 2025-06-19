@@ -27,6 +27,7 @@ import { Link, useNavigate } from "react-router-dom"
       email : "",
       password : ""
     })
+    const [validationError, setValidationError] = useState("");
    
     
 const handelChange = (e)=>{
@@ -35,27 +36,31 @@ setData({...data, [name] : value})
 }
 
 const handelSubmit = async()=>{
+  // Frontend validation
+  if (!data.email || !data.password) {
+    setValidationError("All fields are required.");
+    return;
+  }
+  if (data.password.length < 6) {
+    setValidationError("Password must be at least 6 characters.");
+    return;
+  }
+  setValidationError("");
   const result = await dispatch(loginUser(data)); // Dispatch login action
-    console.log(result);
-    
+  console.log(result);
   if (result.payload?.accessToken) {
-
-      localStorage.setItem("user", JSON.stringify({ name : result.payload?.name  ,token : result.payload?.accessToken})); 
-
-      // Clear form data
-      setData({
-        email: "",
-        password: "",
-      });
-
-      // Navigate to home page
-      navigate("/");
-    }
-  
+    localStorage.setItem("user", JSON.stringify({ name : result.payload?.name  ,token : result.payload?.accessToken})); 
+    setData({
+      email: "",
+      password: "",
+    });
+    navigate("/");
+  }
 }
     return (
     <Center py={5}>
       <Fieldset.Root  size="lg" maxW="md">
+       
         <Stack>
           <Fieldset.Legend>Login Now</Fieldset.Legend>
           <Fieldset.HelperText>
@@ -63,6 +68,7 @@ const handelSubmit = async()=>{
           </Fieldset.HelperText>
         </Stack>
         {error && <Text size={"sm"} color="red.500">{error?.message}</Text>}
+        {validationError && <Text size={"sm"} color="red.500">{validationError}</Text>}
         {user && <p>Welcome, {user.name}!</p>}
         <Fieldset.Content >
           <Field.Root>

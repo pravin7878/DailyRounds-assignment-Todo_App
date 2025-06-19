@@ -32,3 +32,42 @@ Frontend: Add a tab/page to list all users and allow switching between users (sh
 7. Data Export (Optional)
 Backend: Add an endpoint to export todos as JSON/CSV.
 Frontend: Add a button to trigger export.
+
+
+
+
+
+
+{type: 'user/login/rejected', payload: {…}, meta: {…}, error: {…}}
+error
+: 
+{message: 'Rejected'}
+meta
+: 
+aborted
+: 
+false
+arg
+: 
+{email: '', password: ''}
+condition
+: 
+false
+rejectedWithValue
+: 
+true
+requestId
+: 
+"kcqGzGnOyJ7lGeMFEmCDa"
+requestStatus
+: 
+"rejected"
+[[Prototype]]
+: 
+Object
+payload
+: 
+{message: 'Valid email is required.'}
+type
+: 
+"user/login/rejected"

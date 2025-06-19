@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Button,
   Center,
@@ -8,19 +8,22 @@ import {
   NativeSelect,
   Textarea,
   Text,
+  VStack,
 } from "@chakra-ui/react";
 import { toaster } from "../components/ui/toaster"
 import { useDispatch, useSelector } from "react-redux";
 import { addTask } from "../app/actions/task";
+import { fetchAllUsers } from "../app/actions/user";
 import { useNavigate } from "react-router-dom";
+import MentionsInputChakra from '../components/custom/MentionsInputChakra';
 
 const AddNewTask = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { loading, error } = useSelector((state) => state.tasks);
+  const { allUsers } = useSelector((state) => state.user);
   const [errors, setErrors] = useState({});
-
-console.log(useSelector((state) => state.tasks))
+  const [mentions, setMentions] = useState([]);
   const [taskData, setTaskData] = useState({
     title: "",
     priority: "low",
@@ -28,7 +31,11 @@ console.log(useSelector((state) => state.tasks))
     tags: ""
   });
 
-  const { title, priority, description, tags } = taskData;
+  console.log(useSelector((state) => state.tasks))
+console.log("allUsers",allUsers);
+
+  
+
   // Validate form fields
 const validate = () => {
     const newErrors = {};
@@ -40,6 +47,15 @@ return newErrors;
   const handleChange = (e) => {
     const { name, value } = e.target;
     setTaskData({ ...taskData, [name]: value });
+  };
+
+  useEffect(() => {
+    dispatch(fetchAllUsers());
+  }, [dispatch]);
+
+  // Prepare data for MentionsInputChakra
+  const handleMentionsChange = (newMentions) => {
+    setMentions(newMentions);
   };
 
   const handleSubmit = async (e) => {
@@ -54,10 +70,11 @@ return newErrors;
       ...taskData,
       tags: taskData.tags
         ? taskData.tags.split(',').map(t => t.trim()).filter(Boolean)
-        : []
+        : [],
+      mentions: mentions.map(u => u._id),
     };
     const result = await  dispatch(addTask(submitData));
-
+console.log(result)
     if (result.meta.requestStatus === "fulfilled") {
       toaster.create({
         title: "Task added successfully.",
@@ -79,11 +96,9 @@ return newErrors;
         {error && <Text color="red.500">{error?.message}</Text>}
 
         {errors &&   Object.keys(errors).length > 0 && (
-          <Text color="red.500" mb={4}>
-            {Object.values(errors).map((err, index) => (
-              <div key={index}>{err}</div>
-            ))}
-          </Text>
+            Object.values(errors).map((err, index) => (
+              <Text color="red.500" key={index}>{err}</Text>
+            ))
         )}  
         <Field.Root>
           <Field.Label>Title</Field.Label>
@@ -126,6 +141,17 @@ return newErrors;
             placeholder="e.g. work, urgent, personal"
           />
         </Field.Root>
+
+        <Field.Root>
+          <Field.Label>Enter UserName to Mentions</Field.Label>
+          <MentionsInputChakra
+            users={allUsers}
+            value={mentions}
+            onChange={handleMentionsChange}
+            placeholder="Type @ to mention users"
+          />
+        </Field.Root>
+
 
         <Button
           type="submit"

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchTasks, deleteTask, updateTask, addNoteToTask } from '../app/actions/task';
+import { fetchAllUsers } from '../app/actions/user';
 import { Text, Button, VStack, HStack, Flex, SimpleGrid, IconButton, Checkbox, useDisclosure } from '@chakra-ui/react';
 import { Link } from 'react-router-dom';
 import { LuDelete } from 'react-icons/lu';
@@ -13,11 +14,13 @@ import NotesModal from '../components/custom/NotesModal';
 const Dashboard = () => {
   const dispatch = useDispatch();
   const { tasks, loading, error } = useSelector((state) => state.tasks);
+  const { allUsers } = useSelector((state) => state.user);
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   useEffect(() => {
     dispatch(fetchTasks());
-  }, [dispatch]);
+    // dispatch(fetchAllUsers());
+  }, []);
 
   const handleEdit = () => {
     onOpen();
@@ -76,6 +79,18 @@ const Dashboard = () => {
                   ))}
                 </HStack>
               )}
+              {task.mentions && task.mentions.length > 0 && (
+                <HStack wrap="wrap" spacing={1} mb={2}>
+                  {task.mentions.map((userId, idx) => {
+                    const user = allUsers.find(u => u._id === (userId._id || userId));
+                    return user ? (
+                      <Text key={user._id} fontSize="xs" color="blue.500" bg="blue.50" px={2} py={0.5} borderRadius="md">
+                        @{user.name}
+                      </Text>
+                    ) : null;
+                  })}
+                </HStack>
+              )}
               <HStack>
                 <NotesModal
                   notes={task.notes || []}
@@ -88,8 +103,9 @@ const Dashboard = () => {
                     variant="ghost"
                     size="sm"
                     aria-label="Notes"
-                    icon={<FaRegStickyNote />}
-                  />
+                  >
+                    <FaRegStickyNote />
+                  </IconButton>
                 </NotesModal>
 
                 <IconButton variant={"ghost"} size="sm" onClick={() => handleEdit(task)}>

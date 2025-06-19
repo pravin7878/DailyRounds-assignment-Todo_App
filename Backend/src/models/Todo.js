@@ -37,6 +37,10 @@ const todoSchema = mongoose.Schema(
       ref: "User",
       required: true,
     },
+    mentions: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+    }],
   },
   { versionKey: false , timestamps : true}
 );

@@ -1,4 +1,5 @@
 const Todo = require("../models/Todo");
+const User = require("../models/User");
 
 // add a new task
 const addNewTask = async (req, res) => {
@@ -7,12 +8,23 @@ const addNewTask = async (req, res) => {
     description,
     status,
     priority,
-    tags
+    tags,
+    mentions
   } = req.body;
 
   try {
-const isAlreadyExist = await Todo.findOne({title})
-if(isAlreadyExist) return res.status(400).json({message: "can not add duplicate task!"})
+    const isAlreadyExist = await Todo.findOne({title})
+    if(isAlreadyExist) return res.status(400).json({message: "can not add duplicate task!"})
+
+    let mentionsArr = [];
+    if (Array.isArray(mentions) && mentions.length > 0) {
+      // Validate all mentioned users exist
+      const users = await User.find({ _id: { $in: mentions } });
+      if (users.length !== mentions.length) {
+        return res.status(400).json({ message: "One or more mentioned users do not exist." });
+      }
+      mentionsArr = mentions;
+    }
 
     const todo = new Todo({
       title,
@@ -20,7 +32,8 @@ if(isAlreadyExist) return res.status(400).json({message: "can not add duplicate 
       status,
       priority,
       tags: Array.isArray(tags) ? tags : (typeof tags === 'string' ? tags.split(',').map(t => t.trim()).filter(Boolean) : []),
-      userId : req.user?.userId
+      userId : req.user?.userId,
+      mentions: mentionsArr
     });
     const newTaks = await todo.save();
     res.status(201).json({ message: "task added success", newTaks });
@@ -61,9 +74,15 @@ const updateTask = async (req, res) => {
   const { taskId } = req.params;
   const userId = req.user.userId;
   try {
-    // If tags is a string, convert to array
     if (req.body.tags && typeof req.body.tags === 'string') {
       req.body.tags = req.body.tags.split(',').map(t => t.trim()).filter(Boolean);
+    }
+    if (req.body.mentions && Array.isArray(req.body.mentions)) {
+      // Validate all mentioned users exist
+      const users = await User.find({ _id: { $in: req.body.mentions } });
+      if (users.length !== req.body.mentions.length) {
+        return res.status(400).json({ message: "One or more mentioned users do not exist." });
+      }
     }
     const task = await Todo.findOneAndUpdate(
       { _id: taskId, userId },

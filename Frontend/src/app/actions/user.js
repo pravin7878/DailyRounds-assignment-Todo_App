@@ -33,3 +33,16 @@ export const registerUser = createAsyncThunk(
     }
   }
 );
+
+// Fetch all users
+export const fetchAllUsers = createAsyncThunk(
+  'user/fetchAll',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await api.get(`/user`);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);

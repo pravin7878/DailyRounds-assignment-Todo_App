@@ -33,9 +33,9 @@ const taskSlice = createSlice({
       .addCase(addTask.fulfilled, (state, action) => {
         state.loading = false;
         state.tasks.push(action.payload);
-        toaster({
+        toaster.create({
           type : "success",
-          description : "Task New Created!"
+          description : "New Task Created!"
         })
       })
       .addCase(addTask.rejected, (state, action) => {
