@@ -1,5 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { loginUser, registerUser, fetchAllUsers } from '../actions/user';
+import { loginUser, registerUser, fetchAllUsers, getUsers } from '../actions/user';
+
 
 const userSlice = createSlice({
   name: 'user',
@@ -31,6 +32,8 @@ const userSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
+
+
       // Handle register
       .addCase(registerUser.pending, (state) => {
         state.loading = true;
@@ -44,6 +47,8 @@ const userSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
+
+
       // Fetch all users
       .addCase(fetchAllUsers.pending, (state) => {
         state.allUsersLoading = true;
@@ -56,7 +61,25 @@ const userSlice = createSlice({
       .addCase(fetchAllUsers.rejected, (state, action) => {
         state.allUsersLoading = false;
         state.allUsersError = action.payload;
-      });
+      })
+
+
+      // get single user
+      .addCase(getUsers.pending, (state)=>{
+        state.loading = true;
+        state.user = null;
+      })
+
+      .addCase(getUsers.fulfilled, (state,{payload})=>{
+        state.loading = false;
+        state.user = payload;
+        state.error = null
+      })
+
+      .addCase(getUsers.rejected, (state, {payload})=>{
+        state.loading = false;
+        state.error = payload;
+      })
   },
 });
 

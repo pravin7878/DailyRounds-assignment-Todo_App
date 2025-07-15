@@ -26,7 +26,7 @@ export const registerUser = createAsyncThunk(
   'user/register',
   async (userData, { rejectWithValue }) => {
     try {
-      const response = await api.post(`/user/register`, userData);
+      const response = await api.post(`/team/add-new-member`, userData);
       return response.data; // Return user data on success
     } catch (error) {
       return rejectWithValue(error.response.data); // Return error message on failure
@@ -39,7 +39,20 @@ export const fetchAllUsers = createAsyncThunk(
   'user/fetchAll',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await api.get(`/user`);
+      const response = await api.get(`/team`);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+
+// get single user
+export const getUsers = createAsyncThunk(
+  'user/fetch',
+  async (memberId, { rejectWithValue }) => {
+    try {
+      const response = await api.get(`/team/${memberId}`);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response.data);

@@ -7,6 +7,7 @@ const {
   addNoteToTask
 } = require("../controlers/todo");
 const { auth } = require("../middelware/auth");
+const { chackAccess } = require("../middelware/chackAccess");
 
 const todoRouter = express.Router()
 
@@ -14,7 +15,7 @@ const todoRouter = express.Router()
 todoRouter.post("/" ,auth, addNewTask)
 
 // get authenticated user Task 
-todoRouter.get("/" ,auth, getTask)
+todoRouter.get("/" ,auth,chackAccess("Admin"), getTask)
 
 
 // edit a task

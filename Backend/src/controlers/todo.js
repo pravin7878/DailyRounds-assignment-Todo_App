@@ -1,5 +1,5 @@
 const Todo = require("../models/Todo");
-const User = require("../models/User");
+const User = require("../models/user")
 
 // add a new task
 const addNewTask = async (req, res) => {

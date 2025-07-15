@@ -4,6 +4,7 @@ const express = require("express");
 const connectToDB = require("./src/config/db");
 const userRouter = require("./src/routes/user.route");
 const todoRouter = require("./src/routes/todo.routes");
+const teamRouter = require("./src/routes/team")
 const app = express()
 const port = process.env.PORT || 3000
 
@@ -15,6 +16,7 @@ app.get("/" , (req,res)=>{
 app.use(express.json())
 app.use("/user" , userRouter)
 app.use("/tasks" , todoRouter)
+app.use("/team" , teamRouter)
 
 app.listen(port , async()=>{
 console.log(`server is runing on http://localhost:${port}`);
