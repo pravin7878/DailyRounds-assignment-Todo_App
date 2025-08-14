@@ -1,4 +1,4 @@
-import { Box, Button, Spinner, Center } from '@chakra-ui/react'
+import { Box, Button, Spinner, Center, Heading } from '@chakra-ui/react'
 import React, { useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { RiArrowRightLine } from 'react-icons/ri'
@@ -16,16 +16,21 @@ export const Teams = () => {
 
   return (
     <div>
-      <h3 className='text-center font-bold text-2xl'>Manage Your Team</h3>
+      <Center>
+        <Heading>Manage Your Team</Heading>
+      </Center>
+
       <div className='flex justify-end py-3'>
-        <Button fontWeight={"bold"} mb={4}>
-          <Link to={"/team/add"}>Add New</Link>
-          <RiArrowRightLine />
-        </Button>
+        <Link to={"/team/add"}>
+          <Button fontWeight={"bold"} mb={4}>
+            Add New
+            <RiArrowRightLine />
+          </Button>
+        </Link>
       </div>
-      <Box w={"90%"}  mx="auto">
+      <Box mx="auto">
         {allUsersLoading ? (
-          <Center  py={10}><Spinner /></Center>
+          <Center py={10}><Spinner /></Center>
         ) : (
           allUsers && allUsers.length > 0 ? (
             allUsers.map(member => (

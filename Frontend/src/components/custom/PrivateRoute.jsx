@@ -6,7 +6,7 @@ const PrivateRoute = ({ children }) => {
   
   const user = JSON.parse(localStorage.getItem("user"));
 
-  if (!user || !user.token) {
+  if (!user || !user.accessToken) {
     // If no token, redirect to login page
     return <Navigate to="/singin" />;
   }

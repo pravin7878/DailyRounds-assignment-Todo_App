@@ -5,7 +5,7 @@ import { loginUser, registerUser, fetchAllUsers, getUsers } from '../actions/use
 const userSlice = createSlice({
   name: 'user',
   initialState: {
-    user: null,
+    user: (JSON.parse(localStorage.getItem("user")) || null),
     loading: false,
     error: null,
     allUsers: [],
@@ -15,6 +15,8 @@ const userSlice = createSlice({
   reducers: {
     logout: (state) => {
       state.user = null;
+      localStorage.setItem("user", null);
+
     },
   },
   extraReducers: (builder) => {
@@ -27,6 +29,10 @@ const userSlice = createSlice({
       .addCase(loginUser.fulfilled, (state, action) => {
         state.loading = false;
         state.user = action.payload;
+
+        localStorage.setItem("user", JSON.stringify(action.payload));
+
+
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.loading = false;
@@ -65,18 +71,18 @@ const userSlice = createSlice({
 
 
       // get single user
-      .addCase(getUsers.pending, (state)=>{
+      .addCase(getUsers.pending, (state) => {
         state.loading = true;
         state.user = null;
       })
 
-      .addCase(getUsers.fulfilled, (state,{payload})=>{
+      .addCase(getUsers.fulfilled, (state, { payload }) => {
         state.loading = false;
         state.user = payload;
         state.error = null
       })
 
-      .addCase(getUsers.rejected, (state, {payload})=>{
+      .addCase(getUsers.rejected, (state, { payload }) => {
         state.loading = false;
         state.error = payload;
       })

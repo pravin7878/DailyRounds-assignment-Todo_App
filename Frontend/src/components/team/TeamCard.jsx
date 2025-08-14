@@ -6,17 +6,20 @@ export const TeamCard = ({ member }) => {
   return (
     <Box borderWidth={1} borderRadius="md" p={4} mb={3} boxShadow="sm">
       <Text fontWeight="bold">{member.name}</Text>
-      <HStack gap={10}  justify={"space-between"}>
-      <Text>Department: {member.department}</Text>
-      <Text>Position: {member.position}</Text>
-      <Text>Email: {member.email}</Text>
+      <HStack  justify={"space-between"} wrap={"wrap"}>
+        <Text>Department: {member.department}</Text>
+        <Text>Position: {member.position}</Text>
+        <Text>Email: {member.email}</Text>
+        <Button as={Link} to={`/team/${member._id}`} size="sm" mt={2} colorScheme="blue">
+          View Details
+        </Button>
       </HStack>
-     
-      <HStack justify={"end"}>
+
+      {/* <HStack justify={"end"}>
         <Button as={Link} to={`/team/${member._id}`} size="sm" mt={2} colorScheme="blue">
         View Details
       </Button>
-      </HStack>
+      </HStack> */}
     </Box>
   );
 };

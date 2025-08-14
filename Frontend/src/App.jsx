@@ -13,39 +13,45 @@ import Tasks from './pagas/Tasks';
 import { Teams } from './pagas/Teams';
 import AddMemberForm from './components/team/AddMemberForm';
 import { MemberDetailPage } from './components/team/MemberDetailPage';
+import { useSelector } from 'react-redux';
 
 function App() {
-
+  const { user } = useSelector(state => state.user)
+  console.log(user)
   return (
     <>
-    <Toaster />
+      <Toaster />
       <Container>
-          <Layout>
-            <Toaster/>
-            <Routes>
-              <Route path='/' element={<PrivateRoute>
-                <Dashboard/>
-              </PrivateRoute>}/>
-              <Route path='/tasks' element={<PrivateRoute>
-                <Tasks/>
-              </PrivateRoute>}/>
-              <Route path='/task/add' element={<PrivateRoute>
-                <AddNewTask/>
-              </PrivateRoute>}/>
-              <Route path='/team' element={<PrivateRoute>
-                <Teams/>
-              </PrivateRoute>}/>
-              <Route path='/team/:memberId' element={<PrivateRoute>
-                <MemberDetailPage/>
-              </PrivateRoute>}/>
-              <Route path='/team/add' element={<PrivateRoute>
-                <AddMemberForm/>
-              </PrivateRoute>}/>
-
-              <Route path='/singin' element={<Login/>}/>
-              <Route path='/singup' element={<Register/>}/>
-            </Routes>
-          </Layout>
+        <Layout>
+          <Toaster />
+          <Routes>
+            <Route path='/' element={<PrivateRoute>
+              <Dashboard />
+            </PrivateRoute>} />
+            <Route path='/tasks' element={
+              <PrivateRoute>
+                <Tasks />
+              </PrivateRoute>
+            } />
+            <Route path='/tasks/add' element={<PrivateRoute>
+              <AddNewTask />
+            </PrivateRoute>} />
+           
+           
+            <Route path='/team' element={<PrivateRoute>
+              <Teams />
+            </PrivateRoute>} />
+            <Route path='/team/:memberId' element={<PrivateRoute>
+              <MemberDetailPage />
+            </PrivateRoute>} />
+            <Route path='/team/add' element={<PrivateRoute>
+              <AddMemberForm />
+            </PrivateRoute>} />
+         
+            <Route path='/singin' element={<Login />} />
+            <Route path='/singup' element={<Register />} />
+          </Routes>
+        </Layout>
       </Container>
     </>
   )

@@ -7,7 +7,7 @@ function getToken() {
   const user = localStorage.getItem('user');
   if (!user) return null;
   try {
-    return JSON.parse(user).token;
+    return JSON.parse(user).accessToken;
   } catch {
     return null;
   }

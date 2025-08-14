@@ -22,6 +22,7 @@ teamRouter.get("/:memberId" , async(req,res)=>{
     console.log(memberId)
     try {
         const members = await User.findOne({ _id : memberId }).select("-password")
+        console.log(members)
         res.status(200).json(members)
     } catch (err) {
         console.log(err);

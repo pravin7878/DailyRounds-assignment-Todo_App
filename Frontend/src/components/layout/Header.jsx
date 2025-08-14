@@ -14,22 +14,25 @@ import { Link } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { logout } from '../../app/slices/userSlice';
 import { useNavigate } from 'react-router-dom';
+import ProfileButton from '../custom/ProfileButton';
+import PresenceCard from '../ui/Presence';
+import UserInfoCard from '../custom/UserInfoCard';
 
 const Header = () => {
-const [isSerchActive, setIsSerchActive]= useState(false)
-const { user } = useSelector((state) => state.user);
-const dispatch = useDispatch();
-const navigate = useNavigate();
+    const [isSerchActive, setIsSerchActive] = useState(false)
+    const { user } = useSelector((state) => state.user);
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
 
-const handleLogout = () => {
-  dispatch(logout());
-  localStorage.removeItem('user');
-  navigate('/singin');
-}
+    const handleLogout = () => {
+        dispatch(logout());
+        localStorage.removeItem('user');
+        navigate('/singin');
+    }
 
     return (
-        <HStack 
-            px={{ base: 2, md: 6 }}
+        <HStack
+            px={{ base: 2, md: 4 }}
             py={{ base: 1, md: 3 }}
             align="center"
             justify="space-between"
@@ -48,15 +51,15 @@ const handleLogout = () => {
                     </SideBarDrawer>
                 </Box>
                 <Box >
-                                    <Icon>
-                                    <MdAddTask size={20}/>
-                                    </Icon>
-                                </Box>
+                    <Icon>
+                        <MdAddTask size={20} />
+                    </Icon>
+                </Box>
             </HStack>
- 
-            <Box 
-            w={"60%"} 
-            display={{base : isSerchActive ? "block" : "none", md : "block"}}
+
+            <Box
+                w={"60%"}
+                display={{ base: isSerchActive ? "block" : "none", md: "block" }}
             >
                 <InputGroup flex="1" startElement={<LuSearch />} >
                     <Input placeholder="Search task..." />
@@ -69,13 +72,13 @@ const handleLogout = () => {
                     size={["xs", "sm", "md"]}
                     hideFrom={"md"}
                     aria-label="Search database"
-                    onClick={()=>setIsSerchActive(!isSerchActive)}
+                    onClick={() => setIsSerchActive(!isSerchActive)}
                 >
-                   {isSerchActive ? <CgClose/> : <LuSearch />}
+                    {isSerchActive ? <CgClose /> : <LuSearch />}
                 </IconButton>
 
-                <ColorModeButton 
-                hidden={isSerchActive}
+                <ColorModeButton
+                    hidden={isSerchActive}
                 />
 
                 <IconButton
@@ -87,16 +90,19 @@ const handleLogout = () => {
                     <BiBell />
                 </IconButton>
 
-                { user ? (
-                  <Button size={"md"} onClick={handleLogout} hidden={isSerchActive}>
-                    SignOut
-                  </Button>
+                {user ? (<HStack gap={3}>
+                    
+
+                    <PresenceCard clickItem={<ProfileButton />} >
+                       <UserInfoCard handleLogout={handleLogout} isSerchActive={isSerchActive}/>
+                    </PresenceCard>
+                </HStack>
                 ) : (
-                <Link to={"/singin"}>
-                    <Button size={"md"} hidden={isSerchActive}>
-                    SingIn
-                </Button>
-                </Link>
+                    <Link to={"/singin"}>
+                        <Button size={"md"} hidden={isSerchActive}>
+                            SingIn
+                        </Button>
+                    </Link>
                 )}
 
             </HStack>

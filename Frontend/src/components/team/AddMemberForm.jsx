@@ -81,10 +81,12 @@ const AddMemberForm = () => {
     <div
       className='flex justify-end py-3'
     >
-      <Button fontWeight={"bold"} mb={4}>
-        <AiOutlineArrowLeft />
-        <Link to={"/team"}>View Team</Link>
-      </Button>
+      <Link to={"/team"}>
+        <Button fontWeight={"bold"} mb={4}>
+          <AiOutlineArrowLeft />
+          View Team
+        </Button>
+      </Link>
     </div>
 
 

@@ -1,4 +1,5 @@
 import { loginUser } from "../app/actions/user";
+import axios from "axios"
 import {
     Button,
     Center,
@@ -18,6 +19,7 @@ import { Link, useNavigate } from "react-router-dom"
   const Login = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
+
   const { user, loading, error } = useSelector((state) => state.user);
 
 
@@ -31,11 +33,18 @@ import { Link, useNavigate } from "react-router-dom"
    
     
 const handelChange = (e)=>{
+  
 const {name,value} = e.target
 setData({...data, [name] : value})
 }
 
-const handelSubmit = async()=>{
+
+
+
+
+
+const handelSubmit = async(e)=>{
+  e.preventDefault()
   // Frontend validation
   if (!data.email || !data.password) {
     setValidationError("All fields are required.");
@@ -45,18 +54,30 @@ const handelSubmit = async()=>{
     setValidationError("Password must be at least 6 characters.");
     return;
   }
-  setValidationError("");
+
+  console.log(data)
+//   setValidationError("");
   const result = await dispatch(loginUser(data)); // Dispatch login action
-  console.log(result);
+  console.log("action is dispatched",result)
   if (result.payload?.accessToken) {
-    localStorage.setItem("user", JSON.stringify({ name : result.payload?.name  ,token : result.payload?.accessToken})); 
+  
     setData({
       email: "",
       password: "",
     });
+
+
+
     navigate("/");
   }
+  else{
+    console.log(result)
+  }
 }
+
+
+
+
     return (
     <Center py={5}>
       <Fieldset.Root  size="lg" maxW="md">
@@ -85,9 +106,9 @@ const handelSubmit = async()=>{
   
         <Button
           onClick={handelSubmit}
-          type="submit"
           alignSelf="flex-start"
           loading={loading}
+          type="button"
         >
           SingIn
         </Button>
@@ -105,3 +126,5 @@ const handelSubmit = async()=>{
 
   export default Login
   
+
+

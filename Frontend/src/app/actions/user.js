@@ -1,5 +1,6 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import api from '../api';
+import axios from 'axios';
 
 const BACKEND_URI = import.meta.env.VITE_BACKEND_URI;
 
@@ -10,10 +11,12 @@ export const loginUser = createAsyncThunk(
     console.log(BACKEND_URI);
     
     try {
-      const response = await api.post(`/user/login`, credentials);
-     console.log(response.data);
-     
-      return response.data; // Return user data on success
+    //   const response = await api.post(`/user/login`, credentials);
+    //  console.log(response.data);
+ const res = await axios.post("http://localhost:8080/user/login", credentials)
+    
+     console.log(res.data)
+      return res.data; // Return user data on success
 
     } catch (error) {
       return rejectWithValue(error.response.data); // Return error message on failure

@@ -18,6 +18,7 @@ const authenticateUser = async (req, res) => {
         .json({ message: "user not found! , Please register first" });
     if (!password) return res.status(400).json({ message: "password is required" });
     const isPasswordValid = await bcrypt.compare(password, user.password);
+
     if (!isPasswordValid){
       return res.status(401).json({ message: "Password is Wrong" });
     }
@@ -43,6 +44,8 @@ const authenticateUser = async (req, res) => {
       represhToken,
       userId: user._id,
       name: user.name,
+      role : user.role,
+      email : user.email
     });
   } catch (error) {
     console.log(error);
